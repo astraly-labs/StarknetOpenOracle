@@ -1,0 +1,40 @@
+name: Publish Open Oracle Data (Hourly)
+
+on:
+  schedule:
+    - cron:  '0 * * * *'
+  push:
+  workflow_dispatch:
+
+jobs:
+  hourly-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.9'
+
+      - name: Install protostar
+        run: |
+          curl -L https://raw.githubusercontent.com/software-mansion/protostar/master/install.sh | bash -s -- -v 0.4.2
+
+      - name: Install protostar dependencies
+        run: /home/runner/.protostar/dist/protostar/protostar install
+      - name: Compile smart contracts
+        run: /home/runner/.protostar/dist/protostar/protostar build
+
+      - name: Install Python dependencies
+        run: pip install --upgrade -r requirements.txt
+
+      - name: Publish updated data
+        env:
+          ACCOUNT_PRIVATE_KEY : ${{ secrets.ACCOUNT_PRIVATE_KEY }}
+          ACCOUNT_CONTRACT_ADDRESS: ${{ secrets.ACCOUNT_CONTRACT_ADDRESS }}
+          COINBASE_API_SECRET: ${{ secrets.COINBASE_API_SECRET }}
+          COINBASE_API_KEY: ${{ secrets.COINBASE_API_KEY }}
+          COINBASE_API_PASSPHRASE: ${{ secrets.COINBASE_API_PASSPHRASE }}
+        run: python client/main.py

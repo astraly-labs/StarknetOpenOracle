@@ -1,0 +1,12 @@
+["protostar.config"]
+protostar_version = "0.4.2"
+
+["protostar.project"]
+libs_path = "lib"
+
+["protostar.contracts"]
+OpenOraclePublisher = [
+    "contracts/OpenOraclePublisher.cairo",
+]
+
+# AccountTimestampNonce = ["contracts/account/Account.cairo",]
